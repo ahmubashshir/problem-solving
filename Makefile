@@ -1,22 +1,32 @@
 debug :=
 
 << = @echo
-%: %.c
-	$(<<) " CC " $(<)
-	@gcc $(<) -o $(@) -lm -g
-	$(<<) "RUN " $(@)
+
+%.out: %
+%.out: %.o
+	@ $(<<) "LINK" $(<)
+	@ $(CXX) $(<) -o $(@) -g
+	@ $(<<) " RUN" $(@)
 	@ test "$(debug)" = "" && ./$(@) || gdb ./$(@)
-	@ rm $(@)
+#	@ rm $(@)
+
+%.c.o: %.c
+	@ $(<<) "  CC" $(<)
+	@ $(CC) -c $(<) -o $(@) -g
+
+%.cpp.o: %.cpp
+	@ $(<<) " CXX" $(<)
+	@ $(CXX) -c $(<) -o $(@) -g
 
 all:
 	$(<<) "How to use this repo"
 	$(<<)
-	$(<<) "make [solve-file-without-extension [...]]"
+	$(<<) "make [solve-file.out [...]]"
 	$(<<)
 	$(<<) "Example: "
 	$(<<) "make 1001-opposite-task"
 
-clean: $(wildcard *.c)
-	rm -f $(^:%.c=%)
+clean:
+	@rm -f *.out *.o
 
 .PHONY: clean
